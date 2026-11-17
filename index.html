@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="km">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>MT Dubber AI – AI Video Dubbing to Khmer (ភាសាខ្មែរ)</title>
+  <link rel="icon" type="image/png" href="icon.png" />
+  <link rel="shortcut icon" type="image/png" href="icon.png" />
+  <link rel="apple-touch-icon" href="icon.png" />
+  <meta name="theme-color" content="#06080f" />
+  <meta property="og:image" content="logo.jpg" />
+  <meta name="description" content="AI video dubbing to Khmer with Gemini multimodal audio, free Edge Neural voices (Piseth & Sreymom), and token-saving one-pass pipeline." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=Noto+Sans+Khmer:wght@400;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="aurora">
+    <i></i>
+    <i></i>
+    <i></i>
+  </div>
+
+  <div class="wrap">
+    <header class="top">
+      <div class="brand">
+        <div class="logo">
+          <img src="icon.png" alt="MT Dubber logo" />
+        </div>
+        <div>
+          <h1>MT Dubber AI</h1>
+          <p>AI video dubbing to Khmer · Free-tier friendly · Optimized Gemini API</p>
+        </div>
+      </div>
+      <div class="acts">
+        <a class="donate" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" title="Get free Gemini API Key">
+          <span>🔑</span>
+          <b>Get Gemini Key</b>
+        </a>
+        <button class="icon" id="theme" title="Light / Dark mode" type="button">◐</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">
+        <i></i>
+        AI Dubbing Studio · ភាសាខ្មែរ
+      </div>
+      <h2>
+        Dub any video into <span class="grad">Khmer</span>
+      </h2>
+      <p>
+        Transcribe, translate, and voice any video with AI in natural Khmer. Runs directly in your browser with the newest Gemini models &amp; free Edge Neural voices (♂ Piseth &amp; ♀ Sreymom).
+      </p>
+    </section>
+
+    <div class="layout">
+      <main>
+        <div class="card">
+          <div class="drop" id="drop">
+            <div class="dz">⬆</div>
+            <div>
+              <b id="dropTxt">Drop a video here or click to browse</b>
+              <small>MP4, MOV, WebM · File stays safe in your browser</small>
+            </div>
+          </div>
+          <input type="file" id="file" accept="video/*" hidden="" />
+
+          <!-- Logo / Watermark Box -->
+          <div class="logo-box" id="logoBox">
+            <div class="logo-box-head">
+              <span class="logo-title">
+                <b>🖼️ Logo / Watermark</b>
+                <small>(ដាក់ Logo លើវីដេអូ)</small>
+              </span>
+              <label class="sw" style="margin-left:auto;display:flex;align-items:center;gap:6px;cursor:pointer;" title="Enable to burn logo into exported video frames">
+                <input type="checkbox" id="burnLogoChk" data-save="" />
+                <span style="font-size:12px;font-weight:600;color:var(--ok)">Burn to Video (បង្កប់ពេល Export)</span>
+              </label>
+              <button type="button" class="b b-sm" id="btnRemoveLogo" hidden="" style="margin-left:8px;">✕ Remove Logo</button>
+            </div>
+            
+            <div class="logo-row">
+              <div class="logo-drop" id="logoDrop">
+                <input type="file" id="logoFile" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden="" />
+                <div class="logo-preview-wrap" id="logoPreviewWrap" hidden="">
+                  <img id="logoThumb" alt="Logo preview" />
+                </div>
+                <div class="logo-drop-txt" id="logoDropTxt">
+                  <b id="logoDropTitle">+ Choose / Drop Logo</b>
+                  <small>PNG, JPG, WebP · ជ្រើសរើសរូប Logo</small>
+                </div>
+              </div>
+
+              <div class="logo-opts" id="logoOpts">
+                <div class="opt-col">
+                  <label for="logoPos">Position (ទីតាំង)</label>
+                  <select id="logoPos" data-save="">
+                    <option value="top-right" selected="">Top Right (លើ-ស្តាំ)</option>
+                    <option value="top-left">Top Left (លើ-ឆ្វេង)</option>
+                    <option value="bottom-right">Bottom Right (ក្រោម-ស្តាំ)</option>
+                    <option value="bottom-left">Bottom Left (ក្រោម-ឆ្វេង)</option>
+                    <option value="center">Center (កណ្តាល)</option>
+                  </select>
+                </div>
+
+                <div class="opt-col">
+                  <label for="logoSize">Size (ទំហំ): <span id="logoSizeVal">18%</span></label>
+                  <input type="range" id="logoSize" min="5" max="45" value="18" data-save="" />
+                </div>
+
+                <div class="opt-col">
+                  <label for="logoOp">Opacity (ភាពថ្លា): <span id="logoOpVal">90%</span></label>
+                  <input type="range" id="logoOp" min="10" max="100" value="90" data-save="" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="stage" id="stage" hidden="">
+            <video id="v" controls="" playsinline="" preload="auto"></video>
+            <img id="vLogoOverlay" class="v-logo-overlay" hidden="" alt="Watermark overlay" />
+            <div id="cap"></div>
+          </div>
+
+          <div class="ctrl">
+            <label class="vol" title="Lower original video audio when Khmer voice plays (audio ducking)">
+              🔉 Original audio
+              <input type="range" id="vol" min="0" max="100" value="0" data-save="" />
+            </label>
+
+            <div class="cta-split" id="goWrap">
+              <button class="cta" id="go" disabled="" type="button">
+                ✨ Dub to Khmer
+              </button>
+              <button class="cta-mode" id="goModeBtn" type="button" title="Choose Dubbing Mode">
+                <span id="goModeLbl">Full Dub</span> ▾
+              </button>
+              <div class="cta-menu" id="goMenu" hidden="">
+                <button type="button" data-mode="all" class="on">
+                  <b>✨ Dub All Process</b>
+                  <small>Transcribe → Translate → Auto Piseth/Sreymom voice &amp; play</small>
+                </button>
+                <button type="button" data-mode="translate">
+                  <b>📝 Translate Only</b>
+                  <small>Generate Khmer subtitles first, edit, then voice later</small>
+                </button>
+                <button type="button" data-mode="voice">
+                  <b>🔊 Voice Only</b>
+                  <small>Use current subtitles or pasted text to synthesize voice</small>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="prog" aria-hidden="true">
+            <div class="bar" id="bar"></div>
+            <div class="steps">
+              <div class="s" id="s1"><i><span>1</span></i> Transcribe</div>
+              <div class="s" id="s2"><i><span>2</span></i> Translate</div>
+              <div class="s" id="s3"><i><span>3</span></i> Khmer voice</div>
+            </div>
+          </div>
+
+          <div class="busy" id="busy">
+            <div class="ai-core" aria-hidden="true">
+              <div class="ai-ring"></div>
+              <div class="ai-orb"><span class="ai-center">AI</span></div>
+            </div>
+            <div class="eq-visualizer" aria-hidden="true">
+              <b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b>
+            </div>
+            <div class="bm">
+              <div class="stage-tag">
+                <span class="live-dot"></span>
+                <span id="bstage">AI SPEECH RECOGNITION 🎧</span>
+              </div>
+              <div class="bt" id="bt">Finalizing speech segment boundaries</div>
+              <div class="bs" id="bs">Processing: 0:00 · please keep this tab active</div>
+            </div>
+          </div>
+
+          <div class="log" id="log"></div>
+
+          <div class="blog">
+            <div class="bloghead">
+              <span>Activity Log</span>
+              <button class="blogclear" id="blogclear" type="button">Clear</button>
+            </div>
+            <div class="blogbody" id="blogbody"></div>
+          </div>
+        </div>
+
+        <!-- Result / Subtitles Editor Card -->
+        <div class="card" id="resCard" hidden="">
+          <h2>
+            Khmer script
+            <span class="btns">
+              <button class="b" id="genv" type="button">🔊 Voice</button>
+              <button class="b" id="replay" type="button">▶ Replay</button>
+              <button class="b" id="dlaudio" type="button">⬇ Audio</button>
+              <button class="b" id="dl" type="button">⬇ .srt</button>
+              <button class="b p" id="exp" type="button">🎞 Export dubbed video</button>
+            </span>
+          </h2>
+          <div class="edit-hint" id="editHint">
+            <span>✎ Edit Khmer text or click <b>♂ Piseth</b> / <b>♀ Sreymom</b> on any line, then press <b>🔊 Generate Voice</b>.</span>
+          </div>
+          <div class="list" id="list"></div>
+          <p class="note" id="voiceNote"></p>
+        </div>
+      </main>
+
+      <aside>
+        <div class="card">
+          <div class="tabs">
+            <button class="on" data-tab="prov" type="button">Providers</button>
+            <button data-tab="pipe" type="button">Pipeline</button>
+            <button data-tab="subs" type="button">Subtitles</button>
+          </div>
+
+          <!-- Panel 1: Providers & Gemini Key -->
+          <section class="panel" id="tab-prov">
+            <p class="note" style="margin:0 0 12px">
+              Enter one or more Google Gemini API keys (one per line). Multiple keys are automatically rotated to avoid free-tier rate limits!
+            </p>
+            <div class="prov">
+              <div class="ph">
+                <label class="sw">
+                  <input type="checkbox" id="en-gemini" data-save="" checked="" />
+                  <b>Gemini API</b>
+                </label>
+                <span class="tag">transcribe · translate · diarize</span>
+                <a href="https://aistudio.google.com/apikey" rel="noopener" target="_blank">Get free key ↗</a>
+              </div>
+              <textarea id="key" data-save="" style="display:none"></textarea>
+              <div class="keys" id="keyBox"></div>
+              <div class="kctl" id="keyCtl">
+                <button class="b" id="btnAddKey" type="button">＋ Add key</button>
+                <button class="b" id="btnShowKeys" type="button">👁 Show</button>
+                <button class="b" id="btnCheckKeys" type="button" title="Test every key now to see if it is ready or rate-limited">✓ Check keys</button>
+                <span class="note" id="keyCount" style="margin:0 0 0 auto">0 keys</span>
+              </div>
+              <div class="mrow">
+                <span>Active Models (in priority order)</span>
+                <button class="b" id="btnRefreshModels" type="button" data-refresh="gemini">↻ Load</button>
+              </div>
+              <textarea id="model" data-save="" spellcheck="false" style="min-height:140px">gemini-3.8-flash
+gemini-3.5-flash
+gemini-3.5-flash-lite
+gemini-3.7-flash
+gemini-3.6-flash
+gemini-3.8-pro
+gemini-3.1-pro-preview</textarea>
+            </div>
+            <div class="note" style="margin-top:10px;background:rgba(124,108,255,0.08);padding:10px;border-radius:8px;border:1px solid rgba(124,108,255,0.2)">
+              <b>💡 Token Saving Mode Active (ស៊ី API តិច):</b><br/>
+              • Audio is downsampled to 16kHz Mono before sending.<br/>
+              • Silent parts are skipped (0 tokens burned).<br/>
+              • Transcribe + Translate + Gender diarization done in 1 single call!<br/>
+              • Khmer voice uses free Edge Neural TTS (0 Gemini tokens).
+            </div>
+            <p class="note" id="used" style="margin-top:8px"></p>
+          </section>
+
+          <!-- Panel 2: Pipeline Settings -->
+          <section class="panel" id="tab-pipe" hidden="">
+            <label class="f" for="voice">Khmer voice engine</label>
+            <select id="voice" data-save="">
+              <option value="edge" selected="">Edge Voice — Sreymom / Piseth (Natural Khmer Neural, Exportable, Free)</option>
+              <option value="gemini">Gemini Voice (Multimodal TTS, Experimental)</option>
+              <option value="device">This Device’s Built-in Voice (Local speech synthesis)</option>
+            </select>
+
+            <div id="v-edge">
+              <label class="f" for="evoice">Edge Voice Selection</label>
+              <div class="two">
+                <select id="evoice" data-save="">
+                  <option value="auto" selected="">Auto from subtitle gender (♂ Piseth / ♀ Sreymom)</option>
+                  <option value="km-KH-PisethNeural">♂ Piseth (Male only)</option>
+                  <option value="km-KH-SreymomNeural">♀ Sreymom (Female only)</option>
+                </select>
+                <input type="text" id="eurl" data-save="" value="https://khmer-voice-1.onrender.com" placeholder="TTS endpoint (https://... or http://localhost:8000)" style="font-size:12px;" />
+              </div>
+              <div style="display:flex;gap:10px;align-items:center;margin-top:8px">
+                <button class="b" id="etest" type="button">Test Voice</button>
+                <span class="note" id="etestmsg" style="margin:0">Click to preview Sreymom / Piseth voice.</span>
+              </div>
+            </div>
+
+            <div id="v-gemini" hidden="">
+              <label class="f" for="vname">Gemini Voice Persona</label>
+              <select id="vname" data-save="">
+                <optgroup label="♀ Female">
+                  <option value="Zephyr">Zephyr · Female · Bright</option>
+                  <option value="Kore">Kore · Female · Firm</option>
+                  <option value="Leda">Leda · Female · Youthful</option>
+                  <option value="Despina">Despina · Female · Smooth</option>
+                </optgroup>
+                <optgroup label="♂ Male">
+                  <option value="Puck" selected="">Puck · Male · Upbeat</option>
+                  <option value="Charon">Charon · Male · Informative</option>
+                  <option value="Fenrir">Fenrir · Male · Excitable</option>
+                  <option value="Orus">Orus · Male · Firm</option>
+                </optgroup>
+              </select>
+              <label class="f" for="ttsmodel" style="margin-top:10px">Gemini TTS models</label>
+              <textarea id="ttsmodel" data-save="" spellcheck="false" style="min-height:70px">gemini-3.8-flash
+gemini-3.5-flash</textarea>
+            </div>
+          </section>
+
+          <!-- Panel 3: Subtitles Import -->
+          <section class="panel" id="tab-subs" hidden="">
+            <p class="note" style="margin:0 0 10px">
+              Paste your Khmer subtitles (.srt / .vtt) or plain text here. Transcription and translation are completely skipped, saving 100% of your Gemini API quota!
+            </p>
+            <input type="file" id="srt" accept=".srt,.vtt,.txt" style="font-size:13px" />
+            <textarea id="srtText" style="min-height:160px;margin-top:10px" placeholder="1
+00:00:01,000 --> 00:00:03,500
+[Piseth]: សួស្តីបងប្អូនទាំងអស់គ្នា សូមស្វាគមន៍!
+
+2
+00:00:04,000 --> 00:00:06,800
+[Sreymom]: ថ្ងៃនេះយើងនឹងបង្ហាញពីរបៀប dub វីដេអូ។"></textarea>
+          </section>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <p class="foot">
+    Made with ❤ for Khmer creators · Fast &amp; token-efficient AI video dubbing
+  </p>
+
+  <!-- Export Dialog Modal -->
+  <div class="mod" id="xmod">
+    <div class="mbox">
+      <div class="big">🎉</div>
+      <h3>Your Khmer Dub is Ready!</h3>
+      <p id="xinfo">Video exported successfully.</p>
+      <a class="tg" id="xopen" rel="noopener" target="_blank">▶ Open Exported Video</a>
+      <button class="b" id="xsave" type="button" style="width:100%;margin-top:10px">
+        ⬇ Download Video (.mp4 / .webm)
+      </button>
+      <p class="note" id="xwhere" style="margin-top:12px"></p>
+      <button class="mclose" id="xclose" type="button">Close</button>
+    </div>
+  </div>
+
+  <!-- Video Exporting Overlay -->
+  <div class="exp-ov" id="expOv" aria-live="polite">
+    <div class="exp-card">
+      <div class="exp-top">
+        <div class="exp-visual" aria-hidden="true">
+          <div class="exp-reel">
+            <div class="exp-reel-ring"></div>
+            <div class="exp-spokes"></div>
+            <div class="exp-hub">HD</div>
+          </div>
+          <div class="exp-strip">
+            <div class="exp-frames">
+              <i></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
+            <div class="exp-scan"></div>
+          </div>
+        </div>
+        <div class="exp-eq" aria-hidden="true">
+          <b></b><b></b><b></b><b></b><b></b><b></b>
+        </div>
+      </div>
+      <div class="bm">
+        <div class="stage-tag">
+          <span class="live-dot"></span>
+          <span id="expstage">Video Remux &amp; Dubber 🎞️</span>
+        </div>
+        <div class="bt" id="expbt">Rendering high-definition dubbed video</div>
+        <div class="bs" id="expbs">Rendering video: 0:00 · please keep this tab active</div>
+        <div class="exp-prog">
+          <div class="exp-bar-wrap"><i id="expbar"></i></div>
+          <span class="exp-pct" id="exppct">0%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- Main Application Script -->
+  <script src="app.js"></script>
+</body>
+
+</html>
